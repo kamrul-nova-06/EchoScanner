@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Echo Scanner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="login" class="container">
+    <div class="auth-box">
+      <h2>এডমিন লগইন</h2>
+      <input type="email" id="email" placeholder="admin@echoscanner.com" />
+      <input type="password" id="password" placeholder="পাসওয়ার্ড" />
+      <button class="btn" onclick="adminLogin()">লগইন</button>
+    </div>
+  </div>
+
+  <div id="panel" class="container hidden">
+    <header>
+      <a href="/" class="logo"><img src="logo1.png" alt="Echo Scanner"/></a>
+      <button class="btn btn-danger" onclick="logout()">লগআউট</button>
+    </header>
+    <h2>নতুন ফ্যাক্ট যোগ করুন</h2>
+    <div class="form-group">
+      <input type="text" id="title" placeholder="শিরোনাম" />
+      <select id="verdict"><option value="true">সত্য</option><option value="false">মিথ্যা</option></select>
+      <input type="url" id="image" placeholder="ইমেজ লিংক" />
+      <textarea id="content" rows="5" placeholder="বিস্তারিত..."></textarea>
+      <input type="url" id="source" placeholder="সোর্স লিংক" />
+      <button class="btn" onclick="addFact()">যোগ করুন</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const app = initializeApp({ /* same config */ });
+    const auth = getAuth(app);
+
+    window.adminLogin = () => {
+      signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
+        .catch(err => alert(err.message));
+    };
+
+    onAuthStateChanged(auth, user => {
+      if (user && user.email === "admin@echoscanner.com") {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('panel').classList.remove('hidden');
+      } else {
+        document.getElementById('login').classList.remove('hidden');
+        document.getElementById('panel').classList.add('hidden');
+      }
+    });
+
+    window.addFact = () => {
+      const data = {
+        title: document.getElementById('title').value,
+        verdict: document.getElementById('verdict').value === 'true',
+        image: document.getElementById('image').value,
+        content: document.getElementById('content').value,
+        source: document.getElementById('source').value
+      };
+      window.opener.addFact(data);
+      alert("ফ্যাক্ট যোগ হয়েছে!");
+    };
+
+    window.logout = () => signOut(auth);
+  </script>
+</body>
+</html>

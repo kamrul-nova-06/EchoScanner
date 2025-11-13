@@ -5,68 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin - Echo Scanner</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="logo1.png" />
 </head>
 <body>
-  <div id="login" class="container">
-    <div class="auth-box">
+
+  <div class="container">
+
+    <!-- লগইন ফর্ম -->
+    <div id="login" class="auth-box">
       <h2>এডমিন লগইন</h2>
-      <input type="email" id="email" placeholder="admin@echoscanner.com" />
-      <input type="password" id="password" placeholder="পাসওয়ার্ড" />
-      <button class="btn" onclick="adminLogin()">লগইন</button>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="admin@echoscanner.com" value="admin@echoscanner.com" />
+        <input type="password" id="password" placeholder="পাসওয়ার্ড" value="admin12345" />
+        <button class="btn" onclick="adminLogin()">লগইন</button>
+      </div>
+      <p id="error" style="color:#e74c3c; margin-top:0.5rem;"></p>
     </div>
+
+    <!-- এডমিন প্যানেল -->
+    <div id="panel" class="admin-panel hidden">
+      <header>
+        <a href="/" class="logo"><img src="logo1.png" alt="Echo Scanner"/></a>
+        <button class="btn btn-danger" onclick="logout()">লগআউট</button>
+      </header>
+      <h2>নতুন ফ্যাক্ট যোগ করুন</h2>
+      <div class="form-group">
+        <input type="text" id="title" placeholder="শিরোনাম" />
+        <select id="verdict">
+          <option value="true">সত্য</option>
+          <option value="false">মিথ্যা</option>
+        </select>
+        <input type="url" id="image" placeholder="ইমেজ লিংক (https://...)" />
+        <textarea id="content" rows="5" placeholder="বিস্তারিত..."></textarea>
+        <input type="url" id="source" placeholder="সোর্স লিংক" />
+        <button class="btn" onclick="addFact()">যোগ করুন</button>
+      </div>
+      <p id="success" style="color:#00ff88; margin-top:0.5rem;"></p>
+    </div>
+
   </div>
 
-  <div id="panel" class="container hidden">
-    <header>
-      <a href="/" class="logo"><img src="logo1.png" alt="Echo Scanner"/></a>
-      <button class="btn btn-danger" onclick="logout()">লগআউট</button>
-    </header>
-    <h2>নতুন ফ্যাক্ট যোগ করুন</h2>
-    <div class="form-group">
-      <input type="text" id="title" placeholder="শিরোনাম" />
-      <select id="verdict"><option value="true">সত্য</option><option value="false">মিথ্যা</option></select>
-      <input type="url" id="image" placeholder="ইমেজ লিংক" />
-      <textarea id="content" rows="5" placeholder="বিস্তারিত..."></textarea>
-      <input type="url" id="source" placeholder="সোর্স লিংক" />
-      <button class="btn" onclick="addFact()">যোগ করুন</button>
-    </div>
-  </div>
-
+  <!-- Firebase + Firestore -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const app = initializeApp({ /* same config */ });
-    const auth = getAuth(app);
-
-    window.adminLogin = () => {
-      signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
-        .catch(err => alert(err.message));
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdzmp0PXglS_TTYD_9DzIjsinZ3uYTDGY",
+      authDomain: "echoscanner-bd.firebaseapp.com",
+      projectId: "echoscanner-bd",
+      storageBucket: "echoscanner-bd.firebasestorage.app",
+      messagingSenderId: "18608945356",
+      appId: "1:18608945356:web:9e9f957a755e9d9319aa69",
+      measurementId: "G-3QC80XD0XT"
     };
 
-    onAuthStateChanged(auth, user => {
-      if (user && user.email === "admin@echoscanner.com") {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ADMIN_EMAIL = "admin@echoscanner.com";
+
+    // Check if user is admin
+    async function checkAdmin(user) {
+      if (!user || user.email !== ADMIN_EMAIL) return false;
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.email));
+        return userDoc.exists() && userDoc.data().isAdmin === true;
+      } catch (err) {
+        console.error("Admin check error:", err);
+        return false;
+      }
+    }
+
+    // Login
+    window.adminLogin = async () => {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      const errorEl = document.getElementById('error');
+      errorEl.textContent = "";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        errorEl.textContent = "ভুল ইমেইল বা পাসওয়ার্ড!";
+      }
+    };
+
+    // Add Fact
+    window.addFact = async () => {
+      const title = document.getElementById('title').value;
+      const verdict = document.getElementById('verdict').value === "true";
+      const image = document.getElementById('image').value;
+      const content = document.getElementById('content').value;
+      const source = document.getElementById('source').value;
+      const successEl = document.getElementById('success');
+
+      if (!title || !image || !content || !source) {
+        successEl.textContent = "সব ফিল্ড পূরণ করুন!";
+        successEl.style.color = "#e74c3c";
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "facts"), {
+          title,
+          verdict,
+          image,
+          content,
+          source,
+          date: new Date().toISOString().split('T')[0],
+          createdAt: serverTimestamp(),
+          createdBy: auth.currentUser.email
+        });
+
+        // Clear form
+        document.getElementById('title').value = "";
+        document.getElementById('image').value = "";
+        document.getElementById('content').value = "";
+        document.getElementById('source').value = "";
+
+        successEl.textContent = "ফ্যাক্ট যোগ হয়েছে!";
+        successEl.style.color = "#00ff88";
+        setTimeout(() => successEl.textContent = "", 3000);
+      } catch (err) {
+        successEl.textContent = "এরর: " + err.message;
+        successEl.style.color = "#e74c3c";
+      }
+    };
+
+    // Auth State
+    onAuthStateChanged(auth, async (user) => {
+      const isAdminUser = await checkAdmin(user);
+      if (isAdminUser) {
         document.getElementById('login').classList.add('hidden');
         document.getElementById('panel').classList.remove('hidden');
       } else {
         document.getElementById('login').classList.remove('hidden');
         document.getElementById('panel').classList.add('hidden');
+        if (user) {
+          alert("আপনি এডমিন নন।");
+          await signOut(auth);
+        }
       }
     });
 
-    window.addFact = () => {
-      const data = {
-        title: document.getElementById('title').value,
-        verdict: document.getElementById('verdict').value === 'true',
-        image: document.getElementById('image').value,
-        content: document.getElementById('content').value,
-        source: document.getElementById('source').value
-      };
-      window.opener.addFact(data);
-      alert("ফ্যাক্ট যোগ হয়েছে!");
-    };
-
+    // Logout
     window.logout = () => signOut(auth);
   </script>
+
 </body>
 </html>

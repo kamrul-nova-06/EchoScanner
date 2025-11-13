@@ -3,48 +3,149 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Echo Scanner - ইকো স্ক্যানার </title>
-  <meta property="og:title" content="Rumor Scanner" />
-  <meta property="og:description" content="গুজব যাচাই, সত্য প্রকাশ।" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/yourusername/rumor-scanner/main/assets/logo1.png" />
-  <meta property="og:url" content="https://echoscanner-bd.web.app/" />
+  <title>Echo Scanner - গুজব যাচাই</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    \"name\":\"Echo Scanner\",\"short_name\":\"Echo\",
+    \"start_url\":\".\",\"display\":\"standalone\",
+    \"background_color\":\"#0f0f0f\",\"theme_color\":\"#0f0f0f\",
+    \"icons\":[{\"src\":\"logo1.png\",\"sizes\":\"192x192\",\"type\":\"image/png\"}]
+  }"/>
+  <meta name="theme-color" content="#0f0f0f">
+
+  <!-- Dynamic OG Tags -->
+  <meta property="og:title" id="og-title" content="Echo Scanner" />
+  <meta property="og:description" id="og-desc" content="গুজব যাচাই, সত্য প্রকাশ।" />
+  <meta property="og:image" id="og-image" content="https://raw.githubusercontent.com/yourusername/echo-scanner/main/logo1.png" />
+  <meta property="og:url" id="og-url" content="https://echoscanner-bd.web.app/" />
+  <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="assets/style.css" />
-  <link rel="icon" href="assets/logo1.png" />
+  <meta name="twitter:image" id="twitter-image">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Hind Siliguri', sans-serif; background:#0f0f0f; color:#e0e0e0; line-height:1.6; padding-bottom:80px; }
+    .container { max-width:900px; margin:auto; padding:1rem; }
+
+    header { background:#000; padding:0.8rem 0; position:sticky; top:0; z-index:100; border-bottom:1px solid #222; }
+    .logo img { height:40px; border-radius:8px; }
+    nav { float:right; }
+    nav a, nav button { color:#00ff88; margin-left:1rem; text-decoration:none; font-weight:600; font-size:0.9rem; background:none; border:none; cursor:pointer; }
+
+    .hero { text-align:center; padding:2rem 0; }
+    .hero h1 { font-size:1.8rem; color:#00ff88; }
+    .hero p { color:#aaa; }
+
+    .news-card { background:#111; border-radius:12px; overflow:hidden; margin-bottom:1rem; box-shadow:0 3px 8px rgba(0,0,0,0.5); transition:transform 0.2s; }
+    .news-card:hover { transform:translateY(-4px); }
+    .news-card img { width:100%; height:160px; object-fit:cover; }
+    .news-card .content { padding:1rem; }
+    .news-card h3 { font-size:1.1rem; margin-bottom:0.4rem; }
+    .verdict { display:inline-block; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem; font-weight:bold; }
+    .verdict.true { background:#004d26; color:#b2f2bb; }
+    .verdict.false { background:#7f1d1d; color:#ffc9c9; }
+
+    .form-group { margin:0.8rem 0; }
+    .form-group input, .form-group textarea, .form-group select { width:100%; padding:0.8rem; margin-top:0.3rem; border-radius:8px; border:none; background:#222; color:#fff; font-size:1rem; }
+    .btn { background:#00ff88; color:#000; padding:0.8rem 1.2rem; border:none; border-radius:30px; font-weight:bold; cursor:pointer; margin:0.5rem 0.3rem 0.5rem 0; }
+    .btn-danger { background:#e74c3c; }
+    .btn-secondary { background:#555; }
+
+    .profile-card, .admin-panel, .auth-box { background:#111; padding:1.5rem; border-radius:12px; margin:1rem 0; text-align:center; }
+    .profile-card img { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+
+    footer { text-align:center; padding:1.5rem 0; color:#666; background:#000; position:fixed; bottom:0; width:100%; }
+    .footer-logo { height:30px; margin-bottom:0.5rem; }
+
+    .hidden { display:none !important; }
+    .loader { text-align:center; padding:2rem; color:#666; }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size:1.5rem; }
+      nav { float:none; text-align:center; margin-top:0.5rem; }
+      nav a, nav button { display:inline-block; margin:0.3rem; }
+    }
+  </style>
 </head>
 <body>
+
   <header>
     <div class="container">
-      <a href="/" class="logo"><img src="assets/logo1.png" alt="Logo" /></a>
-      <nav>
-        <a href="/">হোম</a>
-        <a href="/admin">এডমিন</a>
+      <a href="/" class="logo"><img src="logo1.png" alt="Echo Scanner" onerror="this.src='https://via.placeholder.com/40?text=ES'"/></a>
+      <nav id="nav-menu">
+        <a href="#home">হোম</a>
+        <button onclick="showSection('login')" id="login-btn">লগইন</button>
+        <button onclick="showSection('profile')" id="profile-btn" class="hidden">প্রোফাইল</button>
+        <button onclick="logout()" id="logout-btn" class="hidden">লগআউট</button>
+        <a href="/admin" id="admin-link" class="hidden">এডমিন</a>
       </nav>
     </div>
+    <div style="clear:both;"></div>
   </header>
 
   <main class="container">
-    <section class="hero">
-      <h1>Echo Scanner</h1>
-      <p>সত্য জানুন, গুজব ছড়াবেন না।</p>
+
+    <!-- লগইন -->
+    <section id="login-section" class="hidden">
+      <div class="auth-box">
+        <h2>লগইন / সাইনআপ</h2>
+        <div class="form-group">
+          <input type="email" id="email" placeholder="ইমেইল" />
+          <input type="password" id="password" placeholder="পাসওয়ার্ড" />
+          <button class="btn" onclick="login()">লগইন</button>
+          <button class="btn btn-secondary" onclick="signup()">সাইনআপ</button>
+          <button class="btn" onclick="googleLogin()">Google</button>
+        </div>
+      </div>
     </section>
 
-    <section class="news-list">
-      <h2>সর্বশেষ ফ্যাক্ট-চেক</h2>
-      <div id="news-container"></div>
+    <!-- হোম -->
+    <section id="home-section">
+      <div class="hero">
+        <h1>Echo Scanner</h1>
+        <p>গুজব যাচাই করুন। সত্য জানুন।</p>
+      </div>
+      <section class="news-list">
+        <h2>সর্বশেষ ফ্যাক্ট-চেক</h2>
+        <div id="news-container"></div>
+      </section>
     </section>
+
+    <!-- প্রোফাইল -->
+    <section id="profile-section" class="hidden">
+      <div class="profile-card">
+        <img id="profile-pic" src="" alt="Profile" />
+        <h3 id="profile-name"></h3>
+        <p id="profile-email"></p>
+        <button class="btn btn-danger" onclick="logout()">লগআউট</button>
+      </div>
+    </section>
+
+    <!-- ফ্যাক্ট ডিটেইল -->
+    <section id="fact-detail" class="hidden">
+      <div class="news-detail" id="fact-content"></div>
+      <div style="text-align:center; margin:1rem 0;">
+        <button class="btn" onclick="shareFact()">শেয়ার করুন</button>
+        <button class="btn btn-secondary" onclick="goBack()">ফিরে যান</button>
+      </div>
+    </section>
+
   </main>
 
   <footer>
     <div class="container">
-      <img src="assets/logo1.png" alt="Logo" class="footer-logo" />
-      <p>&copy; 2025 Rumor Scanner</p>
+      <img src="logo1.png" alt="Echo Scanner" class="footer-logo" onerror="this.src='https://via.placeholder.com/30?text=ES'"/>
+      <p>© 2025 Echo Scanner. সত্যই শক্তি।</p>
     </div>
   </footer>
 
-  <!-- Firebase -->
+  <!-- Firebase + FCM -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
     import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -58,22 +159,185 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const messaging = getMessaging(app);
     const analytics = getAnalytics(app);
-    logEvent(analytics, 'page_view', { page_title: 'Home' });
+    const provider = new GoogleAuthProvider();
 
-    // Load news from localStorage (or Firebase later)
-    const newsData = JSON.parse(localStorage.getItem('rumorNews')) || [];
-    document.getElementById('news-container').innerHTML = newsData.map(n => `
-      <div class="news-card" onclick="location.href='#news-${n.id}'">
-        <img src="${n.image}" alt="${n.title}" loading="lazy" />
-        <div class="content">
-          <h3>${n.title}</h3>
-          <span class="verdict ${n.verdict ? 'true' : 'false'}">
-            ${n.verdict ? 'সত্য' : 'মিথ্যা'}
-          </span>
+    // VAPID Key
+    const vapidKey = "BFzn1Wcuh7oY9Dd_E6t12PW8RBZsH57R_seozzkA137WJVF2HDAjODK7vZt8uqy_mETjc1V_Jso3XkPU7VRm0kE";
+
+    let currentUser = null;
+    let facts = JSON.parse(localStorage.getItem('echoFacts')) || [];
+    let currentFactId = null;
+
+    const sections = {
+      login: document.getElementById('login-section'),
+      home: document.getElementById('home-section'),
+      profile: document.getElementById('profile-section'),
+      fact: document.getElementById('fact-detail')
+    };
+
+    function showSection(id) {
+      Object.values(sections).forEach(s => s.classList.add('hidden'));
+      sections[id].classList.remove('hidden');
+      if (id === 'home') renderFacts();
+      updateOGTags();
+    }
+
+    function updateOGTags(fact = null) {
+      if (fact) {
+        document.getElementById('og-title').content = fact.title;
+        document.getElementById('og-desc').content = fact.verdict ? 'সত্য' : 'মিথ্যা';
+        document.getElementById('og-image').content = fact.image;
+        document.getElementById('og-url').content = window.location.href;
+        document.getElementById('twitter-image').content = fact.image;
+      } else {
+        document.getElementById('og-title').content = "Echo Scanner";
+        document.getElementById('og-desc').content = "গুজব যাচাই, সত্য প্রকাশ।";
+        document.getElementById('og-image').content = "https://raw.githubusercontent.com/yourusername/echo-scanner/main/logo1.png";
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (user) {
+        document.getElementById('login-btn').classList.add('hidden');
+        document.getElementById('profile-btn').classList.remove('hidden');
+        document.getElementById('logout-btn').classList.remove('hidden');
+        if (user.email === "admin@echoscanner.com") {
+          document.getElementById('admin-link').classList.remove('hidden');
+        }
+        document.getElementById('profile-name').textContent = user.displayName || "User";
+        document.getElementById('profile-email').textContent = user.email;
+        document.getElementById('profile-pic').src = user.photoURL || 'https://via.placeholder.com/80?text=U';
+        showSection('home');
+        requestNotificationPermission();
+      } else {
+        document.getElementById('login-btn').classList.remove('hidden');
+        document.getElementById('profile-btn').classList.add('hidden');
+        document.getElementById('logout-btn').classList.add('hidden');
+        document.getElementById('admin-link').classList.add('hidden');
+        showSection('login');
+      }
+    });
+
+    window.login = () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    };
+
+    window.signup = () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    };
+
+    window.googleLogin = () => signInWithPopup(auth, provider);
+
+    window.logout = () => signOut(auth);
+
+    // Push Notification
+    async function requestNotificationPermission() {
+      try {
+        const token = await getToken(messaging, { vapidKey });
+        console.log("FCM Token:", token);
+        localStorage.setItem('fcmToken', token);
+      } catch (err) {
+        console.log("Notification permission denied");
+      }
+    }
+
+    onMessage(messaging, (payload) => {
+      alert(payload.notification.title + ": " + payload.notification.body);
+    });
+
+    // Facts
+    function renderFacts() {
+      const container = document.getElementById('news-container');
+      container.innerHTML = facts.map(f => `
+        <div class="news-card" onclick="showFact(${f.id})">
+          <img src="${f.image}" alt="${f.title}" onerror="this.src='https://via.placeholder.com/300x160?text=No+Image'" />
+          <div class="content">
+            <h3>${f.title}</h3>
+            <span class="verdict ${f.verdict ? 'true' : 'false'}">${f.verdict ? 'সত্য' : 'মিথ্যা'}</span>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
+
+    window.showFact = (id) => {
+      const fact = facts.find(f => f.id === id);
+      if (!fact) return;
+      currentFactId = id;
+      document.getElementById('fact-content').innerHTML = `
+        <h1>${fact.title}</h1>
+        <p class="verdict ${fact.verdict ? 'true' : 'false'}">${fact.verdict ? 'সত্য' : 'মিথ্যা'}</p>
+        <img src="${fact.image}" alt="" style="max-width:100%; border-radius:8px; margin:1rem 0;" />
+        <p>${fact.content.replace(/\n/g, '</p><p>')}</p>
+        <p><strong>উৎস:</strong> <a href="${fact.source}" target="_blank">${fact.source}</a></p>
+        <p><small>তারিখ: ${fact.date}</small></p>
+        <p><strong>লিংক:</strong> <code>https://echoscanner-bd.web.app/#fact-${fact.id}</code></p>
+      `;
+      updateOGTags(fact);
+      showSection('fact');
+      history.pushState(null, null, `#fact-${id}`);
+    };
+
+    window.shareFact = () => {
+      const url = `https://echoscanner-bd.web.app/#fact-${currentFactId}`;
+      if (navigator.share) {
+        navigator.share({ title: document.title, url });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert("লিংক কপি হয়েছে: " + url);
+      }
+    };
+
+    window.goBack = () => {
+      showSection('home');
+      history.pushState(null, null, '/');
+    };
+
+    // Admin: Add Fact
+    window.addFact = (data) => {
+      const fact = {
+        id: Date.now(),
+        ...data,
+        date: new Date().toISOString().split('T')[0]
+      };
+      facts.push(fact);
+      localStorage.setItem('echoFacts', JSON.stringify(facts));
+      renderFacts();
+
+      // Send Email + Push to all users
+      sendNotificationToAll(fact);
+    };
+
+    async function sendNotificationToAll(fact) {
+      const users = JSON.parse(localStorage.getItem('echoUsers') || '[]');
+      users.forEach(u => {
+        if (u.fcmToken) {
+          // FCM Push (Server-side needed for production)
+          console.log("Push to:", u.email);
+        }
+        // Email (use Firebase Functions in production)
+        console.log("Email to:", u.email, fact.title);
+      });
+    }
+
+    // Load from URL hash
+    window.addEventListener('load', () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#fact-')) {
+        const id = parseInt(hash.split('-')[1]);
+        setTimeout(() => showFact(id), 500);
+      }
+    });
+
+    // Initial render
+    renderFacts();
   </script>
 </body>
 </html>

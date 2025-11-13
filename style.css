@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Hind Siliguri', sans-serif;
+  background: #0f0f0f;
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 1rem;
+}
+
+/* Header */
+header {
+  background: #000;
+  padding: 0.8rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #222;
+}
+
+.logo img {
+  height: 40px;
+  border-radius: 8px;
+}
+
+nav {
+  float: right;
+}
+
+nav a, nav button {
+  color: #00ff88;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.hero h1 {
+  font-size: 1.8rem;
+  color: #00ff88;
+}
+
+.hero p {
+  color: #aaa;
+  margin-top: 0.5rem;
+}
+
+/* News Card */
+.news-card {
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+}
+
+.news-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.news-card .content {
+  padding: 1rem;
+}
+
+.news-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.verdict {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.verdict.true {
+  background: #004d26;
+  color: #b2f2bb;
+}
+
+.verdict.false {
+  background: #7f1d1d;
+  color: #ffc9c9;
+}
+
+/* Forms */
+.form-group {
+  margin: 0.8rem 0;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.3rem;
+  border-radius: 8px;
+  border: none;
+  background: #222;
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.btn {
+  background: #00ff88;
+  color: #000;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0.5rem 0.3rem 0.5rem 0;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: #e74c3c;
+}
+
+.btn-secondary {
+  background: #555;
+}
+
+/* Auth & Panels */
+.auth-box,
+.profile-card,
+.admin-panel {
+  background: #111;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.profile-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: #666;
+  background: #000;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.footer-logo {
+  height: 30px;
+  margin-bottom: 0.5rem;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+.loader {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.clear {
+  clear: both;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  nav {
+    float: none;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  nav a, nav button {
+    display: inline-block;
+    margin: 0.3rem;
+  }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rumor Scanner - গুজব যাচাই</title>
+  <meta property="og:title" content="Rumor Scanner" />
+  <meta property="og:description" content="গুজব যাচাই, সত্য প্রকাশ।" />
+  <meta property="og:image" content="https://raw.githubusercontent.com/yourusername/rumor-scanner/main/assets/logo1.png" />
+  <meta property="og:url" content="https://echoscanner-bd.web.app/" />
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" href="assets/logo1.png" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="/" class="logo"><img src="assets/logo1.png" alt="Logo" /></a>
+      <nav>
+        <a href="/">হোম</a>
+        <a href="/admin">এডমিন</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Rumor Scanner</h1>
+      <p>সত্য জানুন, গুজব ছড়াবেন না।</p>
+    </section>
+
+    <section class="news-list">
+      <h2>সর্বশেষ ফ্যাক্ট-চেক</h2>
+      <div id="news-container"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <img src="assets/logo2.png" alt="Logo" class="footer-logo" />
+      <p>&copy; 2025 Rumor Scanner</p>
+    </div>
+  </footer>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdzmp0PXglS_TTYD_9DzIjsinZ3uYTDGY",
+      authDomain: "echoscanner-bd.firebaseapp.com",
+      projectId: "echoscanner-bd",
+      storageBucket: "echoscanner-bd.firebasestorage.app",
+      messagingSenderId: "18608945356",
+      appId: "1:18608945356:web:9e9f957a755e9d9319aa69",
+      measurementId: "G-3QC80XD0XT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    logEvent(analytics, 'page_view', { page_title: 'Home' });
+
+    // Load news from localStorage (or Firebase later)
+    const newsData = JSON.parse(localStorage.getItem('rumorNews')) || [];
+    document.getElementById('news-container').innerHTML = newsData.map(n => `
+      <div class="news-card" onclick="location.href='#news-${n.id}'">
+        <img src="${n.image}" alt="${n.title}" loading="lazy" />
+        <div class="content">
+          <h3>${n.title}</h3>
+          <span class="verdict ${n.verdict ? 'true' : 'false'}">
+            ${n.verdict ? 'সত্য' : 'মিথ্যা'}
+          </span>
+        </div>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>
